@@ -1,0 +1,576 @@
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\hypersetup{unicode=true,
+            pdftitle={Exploring the BRFSS data},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+%%% Change title format to be more compact
+\usepackage{titling}
+
+% Create subtitle command for use in maketitle
+\providecommand{\subtitle}[1]{
+  \posttitle{
+    \begin{center}\large#1\end{center}
+    }
+}
+
+\setlength{\droptitle}{-2em}
+
+  \title{Exploring the BRFSS data}
+    \pretitle{\vspace{\droptitle}\centering\huge}
+  \posttitle{\par}
+    \author{}
+    \preauthor{}\postauthor{}
+    \date{}
+    \predate{}\postdate{}
+  
+
+\begin{document}
+\maketitle
+
+\hypertarget{setup}{%
+\subsection{Setup}\label{setup}}
+
+\hypertarget{load-packages}{%
+\subsubsection{Load packages}\label{load-packages}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(ggplot2)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: package 'ggplot2' was built under R version 3.6.1
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(dplyr)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: package 'dplyr' was built under R version 3.6.1
+\end{verbatim}
+
+\hypertarget{load-data}{%
+\subsubsection{Load data}\label{load-data}}
+
+Make sure your data and R Markdown files are in the same directory. When
+loaded your data file will be called \texttt{brfss2013}. Delete this
+note when before you submit your work.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{load}\NormalTok{(}\StringTok{"brfss2013.RData"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+\hypertarget{part-1-data}{%
+\subsection{Part 1: Data}\label{part-1-data}}
+
+The BRFSS-2013 was a periodic survey, which selected people from the
+United States population, including all states and other regions
+belonging to the territory. The sample selection was given in two ways:
+
+Stratified sample in most states and regions. Simple-sized sample in
+some states and regions.
+
+The interviews all took place via telephone or mobile through a
+structured form, conducted by trained researchers with the aid of
+specific research methodology (CATI), \textbf{by randomly selecting
+phone / cell numbers from each region / province} from participants who
+met the eligibility criteria.
+
+Given the sample size, the applied randomness and the selection in
+several strata, it is possible to state that with such data one can
+infer \textbf{generalization} in the results. In other words, the
+results of such a study have an \textbf{approximation} with the United
+States population.
+
+On the other hand, it \textbf{is not possible} to establish a
+\textbf{causal relationship}, since this research is a survey and no
+methodologies were applied in different subgroups ( \textbf{experimental
+vs.~control} ) in order to investigate a causal relationship.
+Nevertheless, it is possible to make \textbf{associations}
+(correlations) between the study variables.
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+\hypertarget{part-2-research-questions}{%
+\subsection{Part 2: Research
+questions}\label{part-2-research-questions}}
+
+\textbf{Research quesion 1:}
+
+\begin{quote}
+\emph{Are there differences or similarities in access to health coverage
+between ethnicities/races in the state of Alabamas and the District of
+Columbia?}
+\end{quote}
+
+The purpose of this research question is to verify the impact of race /
+ethnicity on access to health insurance between two states. The state of
+Alabamas was randomly selected for comparison with the District of
+Columbia, one of the most African American states in the United States
+in the year this survey was released (2013).
+
+\emph{Variables involved}: Alabama State \texttt{alabama}, District of
+Columbia \texttt{columbia}, Race/ethnicity \texttt{X\_race}, Healthcare
+coverage \texttt{hlthpln1}.
+
+\textbf{Research quesion 2:}
+
+\begin{quote}
+\emph{Do male veterans report high rates of depression?}
+\end{quote}
+
+The purpose of this research question is to examine whether male war
+veterans have a high frequency of self-reported depression, as this is a
+common sense disorder associated with war veterans.
+
+\emph{Variables involved}: Veterans \texttt{veterans}, Male
+\texttt{male}, Depression disorder \texttt{addepev2}
+
+\textbf{Research quesion 3:}
+
+\begin{quote}
+\emph{There are the differences or similarities in marital status in the
+United States male and female population (are there very different or
+similar prevalence)?}
+\end{quote}
+
+This research question aims to investigate through data, the frequency
+and proportion of the most prevalent marital status in the United
+States, reported between the sexes and to look for similarities and
+differences.
+
+\emph{Variables involved}: Male \texttt{male}, Female \texttt{female},
+Marital status \texttt{marital}
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+\hypertarget{part-3-exploratory-data-analysis}{%
+\subsection{Part 3: Exploratory data
+analysis}\label{part-3-exploratory-data-analysis}}
+
+NOTE: Insert code chunks as needed by clicking on the ``Insert a new
+code chunk'' button (green button with orange arrow) above. Make sure
+that your code is visible in the project you submit. Delete this note
+when before you submit your work.
+
+\textbf{Research quesion 1:}
+
+To investigate this problem, it was filtered the variables from each of
+the selected states \texttt{columbia} and \texttt{alabama}, assigning
+them to a specific new dataframe.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{alabama<-(}\KeywordTok{filter}\NormalTok{(brfss2013,X_state }\OperatorTok{==}\StringTok{ "Alabama"}\NormalTok{))}
+\NormalTok{columbia<-(}\KeywordTok{filter}\NormalTok{(brfss2013,X_state }\OperatorTok{==}\StringTok{ "District of Columbia"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+Then, a frequency table was generated, containing the race vectors and
+the vector asking if the interviewee has any access to any health
+coverage.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{alabamahealth<-}\KeywordTok{table}\NormalTok{(alabama}\OperatorTok{$}\NormalTok{X_race, alabama}\OperatorTok{$}\NormalTok{hlthpln1) }
+\NormalTok{columbiahealth<-}\KeywordTok{table}\NormalTok{(columbia}\OperatorTok{$}\NormalTok{X_race, columbia}\OperatorTok{$}\NormalTok{hlthpln1)}
+\end{Highlighting}
+\end{Shaded}
+
+Finally, the frequency values are transformed in proportion, so that
+they are prepared for the creation of a barplot.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{alabamahealth2<-}\KeywordTok{prop.table}\NormalTok{(alabamahealth, }\DecValTok{2}\NormalTok{) }
+\NormalTok{columbiaahealth2<-}\KeywordTok{prop.table}\NormalTok{(columbiahealth, }\DecValTok{2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+The barplot is created by assigning subtitles and attributed race
+specific colors in the subtitles of the barplot.
+
+Color Insertion
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{barplot}\NormalTok{(alabamahealth2, }\DataTypeTok{xlab=}\StringTok{"Have any Healthcare coverage?"}\NormalTok{,}\DataTypeTok{col=}\DecValTok{1}\OperatorTok{:}\DecValTok{8}\NormalTok{) }
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{new_wip_victor_files/figure-latex/unnamed-chunk-4-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{barplot}\NormalTok{(columbiaahealth2, }\DataTypeTok{xlab=}\StringTok{"Have any Healthcare coverage?"}\NormalTok{,}\DataTypeTok{col=}\DecValTok{1}\OperatorTok{:}\DecValTok{8}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{new_wip_victor_files/figure-latex/unnamed-chunk-4-2.pdf}
+
+Subtitles Insertion
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{barplot}\NormalTok{(alabamahealth2,}\DataTypeTok{legend =} \KeywordTok{rownames}\NormalTok{(alabamahealth2), }\DataTypeTok{xlab=}\StringTok{"Have any Healthcare coverage?"}\NormalTok{,}\DataTypeTok{col=}\DecValTok{1}\OperatorTok{:}\DecValTok{8}\NormalTok{) }
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{new_wip_victor_files/figure-latex/unnamed-chunk-5-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{barplot}\NormalTok{(columbiaahealth2,}\DataTypeTok{legend =} \KeywordTok{rownames}\NormalTok{(columbiaahealth2), }\DataTypeTok{xlab=}\StringTok{"Have any Healthcare coverage?"}\NormalTok{,}\DataTypeTok{col=}\DecValTok{1}\OperatorTok{:}\DecValTok{8}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{new_wip_victor_files/figure-latex/unnamed-chunk-5-2.pdf}
+
+After performing the process for each state (\texttt{alabama} and
+\texttt{columbia}), the barplots of each state are inserted in a single
+view.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{par}\NormalTok{(}\DataTypeTok{mfrow =} \KeywordTok{c}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\DecValTok{2}\NormalTok{))}
+
+\KeywordTok{barplot}\NormalTok{(alabamahealth2, }\DataTypeTok{main =} \StringTok{"Alabama"}\NormalTok{, }\DataTypeTok{col=}\DecValTok{1}\OperatorTok{:}\DecValTok{8}\NormalTok{) }
+\KeywordTok{barplot}\NormalTok{(columbiaahealth2, }\DataTypeTok{main =} \StringTok{"District of Columbia"}\NormalTok{, }\DataTypeTok{col=}\DecValTok{1}\OperatorTok{:}\DecValTok{8}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{new_wip_victor_files/figure-latex/unnamed-chunk-6-1.pdf}
+
+Its possible to see some interesting results. White people in both
+states have a higher rate in the variable access to health coverage
+(\texttt{hlthpln1}) and in the situation that they do not, it is much
+less than black people. Thus showing strong evidence for the greater
+\textbf{unfeasibility} of health coverage for the public of non-white
+ethnic groups, and especially for the black population. A
+\texttt{summary} with sample-specific details is displayed in the
+summary below.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{columbiahealth}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                                                               
+##                                                                 Yes   No
+##   White only, non-Hispanic                                     2172   36
+##   Black only, non-Hispanic                                     2024  151
+##   American Indian or Alaskan Native only, Non-Hispanic           18    2
+##   Asian only, non-Hispanic                                       86    3
+##   Native Hawaiian or other Pacific Islander only, Non-Hispanic    6    1
+##   Other race only, non-Hispanic                                  47    4
+##   Multiracial, non-Hispanic                                      75    1
+##   Hispanic                                                      154   19
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{alabamahealth}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                                                               
+##                                                                 Yes   No
+##   White only, non-Hispanic                                     4224  377
+##   Black only, non-Hispanic                                     1298  281
+##   American Indian or Alaskan Native only, Non-Hispanic           67   11
+##   Asian only, non-Hispanic                                       15    1
+##   Native Hawaiian or other Pacific Islander only, Non-Hispanic    2    0
+##   Other race only, non-Hispanic                                  28    5
+##   Multiracial, non-Hispanic                                      47    3
+##   Hispanic                                                       46   14
+\end{verbatim}
+
+\textbf{Research quesion 2:}
+
+To investigate this problem, it was first filtered out the variables of
+interest (\texttt{veterans} and \texttt{male}) by assigning them to a
+new dataframe (\texttt{veteransmale}).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{veterans<-(}\KeywordTok{filter}\NormalTok{(brfss2013,veteran3 }\OperatorTok{==}\StringTok{ "Yes"}\NormalTok{))}
+\NormalTok{veteransmale<-(}\KeywordTok{filter}\NormalTok{(veterans,sex }\OperatorTok{==}\StringTok{ "Male"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+Then, a frequency table containing the vectors of interest was
+generated. That was also transformed in proportion to facilitate
+interpretation of the analysis.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{table}\NormalTok{(veteransmale}\OperatorTok{$}\NormalTok{addepev2)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##   Yes    No 
+##  8391 47254
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{prop.table}\NormalTok{(}\KeywordTok{table}\NormalTok{(veteransmale}\OperatorTok{$}\NormalTok{addepev2))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##       Yes        No 
+## 0.1507952 0.8492048
+\end{verbatim}
+
+The results indicate that 15\% of respondents (\texttt{prop.table}) in
+this category indicate self-reported depressive disorder, in contrast
+approximately 85\% claim not to have.
+
+To facilitate the reader's visualization, it was decided to turn these
+results into a bar chart.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{barplot}\NormalTok{(}\KeywordTok{xtabs}\NormalTok{(}\OperatorTok{~}\NormalTok{veteransmale}\OperatorTok{$}\NormalTok{addepev2),}\DataTypeTok{xlab =} \StringTok{"Ever Told You Had A Depressive Disorder?"}\NormalTok{, }\DataTypeTok{ylab =} \StringTok{"Frequency"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{new_wip_victor_files/figure-latex/unnamed-chunk-10-1.pdf}
+
+Compared to the overall United States average (showed below), the
+frequency of self-reported depression of male veterans is lower (overall
+US average: 19\%) but slightly higher compared to the overall male
+population (average: 14\%).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{prop.table}\NormalTok{(}\KeywordTok{table}\NormalTok{(brfss2013}\OperatorTok{$}\NormalTok{addepev2))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##       Yes        No 
+## 0.1956726 0.8043274
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{male<-(}\KeywordTok{filter}\NormalTok{(brfss2013,sex }\OperatorTok{==}\StringTok{ "Male"}\NormalTok{))}
+\KeywordTok{prop.table}\NormalTok{(}\KeywordTok{table}\NormalTok{(male}\OperatorTok{$}\NormalTok{addepev2))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##       Yes        No 
+## 0.1421308 0.8578692
+\end{verbatim}
+
+\textbf{Research question 3:}
+
+To investigate this problem, it was first filtered out the variables of
+interest (male and female separately) by attributing to distinct
+dataframes (\texttt{male} - already did in the Question 2- and
+\texttt{female}).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{male<-(}\KeywordTok{filter}\NormalTok{(brfss2013,sex }\OperatorTok{==}\StringTok{ "Male"}\NormalTok{))}
+\NormalTok{female<-(}\KeywordTok{filter}\NormalTok{(brfss2013,sex }\OperatorTok{==}\StringTok{ "Female"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+To summarise the results, a frequency table was generated, containing
+the vectors of interest with the main variable separately (in this case,
+\texttt{marital}). Finally, the frequency values were also transformed
+in proportion to better understand the analysis performed.
+
+\emph{The Female Marital status results:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{table}\NormalTok{(female}\OperatorTok{$}\NormalTok{marital)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##                         Married                        Divorced 
+##                          139268                           44140 
+##                         Widowed                       Separated 
+##                           52998                            6810 
+##                   Never married A member of an unmarried couple 
+##                           37845                            7302
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{prop.table}\NormalTok{(}\KeywordTok{table}\NormalTok{(female}\OperatorTok{$}\NormalTok{marital))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##                         Married                        Divorced 
+##                      0.48296071                      0.15307096 
+##                         Widowed                       Separated 
+##                      0.18378918                      0.02361607 
+##                   Never married A member of an unmarried couple 
+##                      0.13124083                      0.02532225
+\end{verbatim}
+
+\emph{The Male Marital status results:}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{table}\NormalTok{(male}\OperatorTok{$}\NormalTok{marital)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##                         Married                        Divorced 
+##                          114060                           26236 
+##                         Widowed                       Separated 
+##                           12747                            3852 
+##                   Never married A member of an unmarried couple 
+##                           37225                            5871
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{prop.table}\NormalTok{(}\KeywordTok{table}\NormalTok{(male}\OperatorTok{$}\NormalTok{marital))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##                         Married                        Divorced 
+##                      0.57032566                      0.13118590 
+##                         Widowed                       Separated 
+##                      0.06373787                      0.01926087 
+##                   Never married A member of an unmarried couple 
+##                      0.18613338                      0.02935632
+\end{verbatim}
+
+The overall results indicate similarity responses between the sexes in
+general but one exceptional variable draws particular attention: Widowed
+people. Widowed women (18\%) are 3 times larger in proportion compared
+to widowed men (6\%) pointing out this major difference.
+
+
+\end{document}
