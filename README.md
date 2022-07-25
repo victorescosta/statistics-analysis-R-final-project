@@ -1,5 +1,5 @@
 # Statistics with R - Final project
-Final project for the completion of module 01 of the course statistics with R done on the coursera platform. 
+Final project for the completion of module 01 of the course statistics with R done on the coursera platform (done in 2019). 
 
 final-project files are the definitive ones.
 
